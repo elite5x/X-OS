@@ -82,6 +82,20 @@ def test_session_files() -> None:
         pkgs = lists.read_text(encoding="utf-8")
         for need in ("sddm", "kwin", "layer-shell-qt", "qt6-wayland", "polkitd"):
             ok(f"package list has {need}", need in pkgs)
+    # Karar korumaları (2026-10-22): XVault + Hypervisor önce kontrat
+    reg = (ROOT / "integrations/dbus/README.md").read_text(encoding="utf-8")
+    ok("dbus registry lists XVault + Hypervisor",
+       "io.xos.XVault" in reg and "io.xos.Hypervisor" in reg)
+    ok("x-vault contract exists",
+       (ROOT / "integrations/x-vault/README.md").exists()
+       and "AES-256-GCM" in (ROOT / "integrations/x-vault/README.md").read_text(encoding="utf-8"))
+    ok("hypervisor contract exists",
+       (ROOT / "integrations/hypervisor/README.md").exists()
+       and "io.xos.hypervisor.manage" in (ROOT / "integrations/hypervisor/README.md").read_text(encoding="utf-8"))
+    ok("xvault app skeleton exists", (ROOT / "apps/xvault/README.md").exists())
+    ok("roadmap records PlasmaX base decision",
+       "kde-material-you-colors" in (ROOT / "docs/roadmap.md").read_text(encoding="utf-8"))
+
     # Canlı açılış için includes.chroot kritik dosyalar
     sddm = root / "etc/sddm.conf.d/10-xos.conf"
     ok("sddm autologin conf exists", sddm.exists())
