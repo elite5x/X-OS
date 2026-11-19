@@ -12,6 +12,10 @@ Item {
     signal launcherRequested()
 
     readonly property int count: apps && apps.count !== undefined ? apps.count : 0
+    // Katalog sınırd dock: ISO'da 50+ .desktop olabilir → tüm liste
+    // ekranı aşar. Alfabetik ilk N gösterilir; favori/sabitlenmiş liste
+    // v0.2'de gelecek (roadmap). Row, visible:false öğeleri dışlar.
+    readonly property int maxIcons: 9
     readonly property real iconSize: Theme.dockIcon
     readonly property int padding: Theme.s.md
 
@@ -51,6 +55,8 @@ Item {
                 required property string name
                 required property string icon
                 required property bool running
+
+                visible: index < root.maxIcons
 
                 readonly property real dist: {
                     // HandlerPoint position is in this cell's coordinates.

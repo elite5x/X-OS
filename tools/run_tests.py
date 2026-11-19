@@ -82,6 +82,27 @@ def test_session_files() -> None:
         pkgs = lists.read_text(encoding="utf-8")
         for need in ("sddm", "kwin", "layer-shell-qt", "qt6-wayland", "polkitd"):
             ok(f"package list has {need}", need in pkgs)
+    # Karar korumaları (2026-10-22): XVault + Hypervisor önce kontrat
+    reg = (ROOT / "integrations/dbus/README.md").read_text(encoding="utf-8")
+    ok("dbus registry lists XVault + Hypervisor",
+       "io.xos.XVault" in reg and "io.xos.Hypervisor" in reg)
+    ok("x-vault contract exists",
+       (ROOT / "integrations/x-vault/README.md").exists()
+       and "AES-256-GCM" in (ROOT / "integrations/x-vault/README.md").read_text(encoding="utf-8"))
+    ok("hypervisor contract exists",
+       (ROOT / "integrations/hypervisor/README.md").exists()
+       and "io.xos.hypervisor.manage" in (ROOT / "integrations/hypervisor/README.md").read_text(encoding="utf-8"))
+    ok("xvault app skeleton exists", (ROOT / "apps/xvault/README.md").exists())
+    da = (ROOT / "shell/src/desktopapps.cpp").read_text(encoding="utf-8")
+    ok("desktop launch avoids shell (/bin/sh -c yok)", "/bin/sh" not in da)
+    ok("dock caps catalog with maxIcons",
+       "maxIcons" in (ROOT / "shell/qml/PlasmaX/panels/Dock.qml").read_text(encoding="utf-8"))
+    ok("WhiteSur-kde vendored for PlasmaX base",
+       (ROOT / "third_party/WhiteSur-kde/LICENSE").exists()
+       and (ROOT / "third_party/WhiteSur-kde/install.sh").exists())
+    ok("roadmap records PlasmaX base decision",
+       "kde-material-you-colors" in (ROOT / "docs/roadmap.md").read_text(encoding="utf-8"))
+
     # Canlı açılış için includes.chroot kritik dosyalar
     sddm = root / "etc/sddm.conf.d/10-xos.conf"
     ok("sddm autologin conf exists", sddm.exists())
@@ -98,6 +119,30 @@ def test_session_files() -> None:
     else:
         ok("sddm conf is tracked in git", r.returncode == 0, r.stderr.strip())
     ok("hostname include exists", (root / "etc/hostname").exists())
+    # v0.1 ISO hatalısı: shell binary'si imaja hiç girmemişti (oturum
+    # plasmex'i sessizce atlayıp SDDM'ye dönmüştü) — kalıcı korumalar:
+    iso = (ROOT / "system/build-iso.sh").read_text(encoding="utf-8")
+    ok("build-iso stages plasmex into includes.chroot",
+       "stage_shell" in iso and "cmake --install" in iso
+       and "includes.chroot/usr/bin/plasmex" in iso)
+    ok("build-iso has no-shell escape hatch",
+       "XOS_ISO_ALLOW_NO_SHELL" in iso)
+    ci = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    iso_job = ci[ci.index("name: X-OS canlı ISO"):]
+    ok("ci ISO job has shell build toolchain",
+       "qt6-base-dev" in iso_job and "build-essential" in iso_job
+       and "cmake" in iso_job)
+    pl = (ROOT / "system/live-build/config/package-lists/xos.list.chroot").read_text(encoding="utf-8")
+    stripped = pl.replace("kf6-breeze-icon-theme", "")
+    ok("package list has valid breeze icon theme name",
+       "kf6-breeze-icon-theme" in pl and "breeze-icons" not in stripped
+       and "breeze-cursor-theme" in pl)
+    ok("ci preflights full package list before lb build",
+       "apt-get -s install" in ci)
+    ses = (root / "usr/local/bin/xos-session").read_text(encoding="utf-8")
+    ok("session writes diagnostic log", "/tmp/xos-session.log" in ses)
+    ok("session reports missing plasmex loudly",
+       "plasmex komutu YOK" in ses)
     kbd = root / "etc/default/keyboard"
     ok("xkb default keyboard include exists", kbd.exists())
     if kbd.exists():

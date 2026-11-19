@@ -23,6 +23,10 @@ Window {
     readonly property bool darkMode: !Theme.lightMode
 
     visible: true
+    // Normal oturumda pencere MUTLAKA tam ekran olmalı: boyutsuz bırakılırsa
+    // çerçevesiz pencere görünmez kalır (v0.1'deki "çalışmıyor" semptomu).
+    // --preview modu C++ tarafında boyutu yeniden ayarlar.
+    visibility: Window.FullScreen
     color: "transparent"
     flags: Qt.FramelessWindowHint
     title: "PlasmaX"
