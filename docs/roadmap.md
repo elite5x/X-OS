@@ -35,6 +35,8 @@ Sürüm adayları Debian Stable döngüsüne bağlanır; hedef her aşamada
 
 - [ ] ISO paket listesi: `plasma-workspace` + sddm (mevcut) + WhiteSur KDE +
       `kde-material-you-colors` kurulumu
+      *(WhiteSur repoda: `third_party/WhiteSur-kde` @ cf4df59 — material-you
+      ISO sırasında çekilecek, bkz. `third_party/README.md`)*
 - [ ] `xos-session` → plasmashell oturumu (KWin duruyor, plasmex yerine)
 - [ ] Marka katmanı: X-OS duvar kâğıdı, ikon seti, kilit ekranı, ayarlar
 - [ ] Material You: duvar kâğıdı değişince palet canlı güncellensin

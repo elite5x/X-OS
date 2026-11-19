@@ -93,6 +93,9 @@ def test_session_files() -> None:
        (ROOT / "integrations/hypervisor/README.md").exists()
        and "io.xos.hypervisor.manage" in (ROOT / "integrations/hypervisor/README.md").read_text(encoding="utf-8"))
     ok("xvault app skeleton exists", (ROOT / "apps/xvault/README.md").exists())
+    ok("WhiteSur-kde vendored for PlasmaX base",
+       (ROOT / "third_party/WhiteSur-kde/LICENSE").exists()
+       and (ROOT / "third_party/WhiteSur-kde/install.sh").exists())
     ok("roadmap records PlasmaX base decision",
        "kde-material-you-colors" in (ROOT / "docs/roadmap.md").read_text(encoding="utf-8"))
 
