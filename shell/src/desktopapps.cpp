@@ -125,16 +125,40 @@ void DesktopApps::launchIndex(int row)
     if (row < 0 || row >= m_apps.size())
         return;
     const DesktopApp &app = m_apps.at(row);
-    // Strip field codes (%f %u …) and launch detached.
+
+    // Desktop Entry spesifikasyonu: Exec bir SHELL dizesi DEĞİLDİR.
+    // 1) Alan kodlarını temizle (%% → geçici işaret → literal %).
+    // 2) Tırnaklara duyarlı tokenizer ile argv'ye böl.
+    // 3) sh -c ile çalıştırma YOK: shell meta-karakterleri yorumlanmaz
+    //    (güvenli, spesiyasyona uyumlu).
     QString exec = app.exec;
+    exec.replace(QStringLiteral("%%"), QStringLiteral("\u0001"));
     exec.remove(QRegularExpression(QStringLiteral("%[fFuUdDnNickvm]")));
-    exec = exec.trimmed();
-    if (exec.startsWith(QLatin1Char('"')) && exec.endsWith(QLatin1Char('"')))
-        exec = exec.mid(1, exec.size() - 2);
-    QProcess::startDetached(QStringLiteral("/bin/sh"), {QStringLiteral("-c"), exec});
-    m_apps[row].running = true;
-    const QModelIndex idx = index(row);
-    emit dataChanged(idx, idx, { RunningRole });
+    exec.replace(QStringLiteral("\u0001"), QStringLiteral("%"));
+
+    QStringList args;
+    QString cur;
+    bool inS = false, inD = false;
+    for (const QChar c : exec) {
+        if (c == QLatin1Char('\'') && !inD) { inS = !inS; continue; }
+        if (c == QLatin1Char('"') && !inS)  { inD = !inD; continue; }
+        if (c.isSpace() && !inS && !inD) {
+            if (!cur.isEmpty()) { args.append(cur); cur.clear(); }
+            continue;
+        }
+        cur.append(c);
+    }
+    if (!cur.isEmpty())
+        args.append(cur);
+    if (args.isEmpty())
+        return;
+
+    // Yalnızca süreç gerçekten başladıysa "running" işaretle.
+    if (QProcess::startDetached(args.takeFirst(), args) && !m_apps[row].running) {
+        m_apps[row].running = true;
+        const QModelIndex idx = index(row);
+        emit dataChanged(idx, idx, { RunningRole });
+    }
 }
 
 void DesktopApps::launch(const QString &desktopId)

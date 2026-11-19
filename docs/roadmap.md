@@ -45,6 +45,7 @@ Sürüm adayları Debian Stable döngüsüne bağlanır; hedef her aşamada
 ## v0.2 "Masaüstü"
 
 - [ ] Masaüstü ikonları (`.desktop` sürükle-bırak, ızgara snap)
+- [ ] Dock favorileri (sabitlenmiş uygulamalar; şimdilik alfabetik ilk 9 sınırı)
 - [ ] KWin scripti: aktif pencere adı, tam ekran takibi
 - [ ] Duvar kâğıdı seçici (jetonlanmış: aurora / ember / light / görsel)
 - [ ] Sticker paleti genişlemesi (yazı sticker'ı, saatin sticker'ı)

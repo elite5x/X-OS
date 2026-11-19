@@ -93,6 +93,10 @@ def test_session_files() -> None:
        (ROOT / "integrations/hypervisor/README.md").exists()
        and "io.xos.hypervisor.manage" in (ROOT / "integrations/hypervisor/README.md").read_text(encoding="utf-8"))
     ok("xvault app skeleton exists", (ROOT / "apps/xvault/README.md").exists())
+    da = (ROOT / "shell/src/desktopapps.cpp").read_text(encoding="utf-8")
+    ok("desktop launch avoids shell (/bin/sh -c yok)", "/bin/sh" not in da)
+    ok("dock caps catalog with maxIcons",
+       "maxIcons" in (ROOT / "shell/qml/PlasmaX/panels/Dock.qml").read_text(encoding="utf-8"))
     ok("WhiteSur-kde vendored for PlasmaX base",
        (ROOT / "third_party/WhiteSur-kde/LICENSE").exists()
        and (ROOT / "third_party/WhiteSur-kde/install.sh").exists())
